@@ -1,0 +1,81 @@
+---
+title: "Tarea-2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Estructuras de control 
+
+* ¿Cuál es la probabilidad de obtener un seis en un dado? Vamos a calcularlo usando un `for loop`. Programen los siguientes pasos.
+
+1. Crear un vector *x* vacío de longitug *n*
+2. Dentro de un `for`, asignar a cada entrada del vector *x* un número aleatorio entre 1 y 6, usando el comando `sample(1:6, size = 1)`.
+3. Una vez que tengan *n* realizaciones de un lanzamiento de dado, cuenten cuántas entradas de este vector son iguales a 6. Si dividimos este número entre *n*, obtendremos la probabilidad de obtener un seis.
+
+```{r}
+n <- 100
+attempts <- vector("numeric", length = n)
+for(i in seq_along(attempts)){
+  attempts[i]= sample(1:6, size = 1)
+}
+
+sixs <- attempts[attempts==6]
+z <- length(sixs)/n
+z
+```
+
+## Funciones
+
+Creen una función a partir del ejemplo anterior, que reciba dos argumentos:
+
+1. El número de lanzamientos de dado.
+2. La probabilidad de obtener *x*, donde `x∈{1,2,3,4,5,6}`.
+
+```{r}
+f <- function(n = 1, x = 1){
+  if (x >= 1 && x <= 6) {
+    attempts <- vector("numeric", length = n)
+    for(i in seq_along(attempts)){
+      attempts[i]= sample(1:6, size = 1)
+    }
+    filter <- attempts[attempts==x]
+    z <- length(filter)/n
+    cat("La probabilidad es", z)
+  } else{
+    cat("Error, x debe ser 1, 2, 3, 4, 5, 6")
+  }
+}
+f(n=100, x=5)
+```
+
+## Loops
+
+Usando los datos de stocks de siempre, calculen el volumen promedio de todos los índices del año 2019 usando `split-apply`.
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r, message=FALSE, warning=FALSE}
+stock <- read.csv("datos/indexData.csv", header = TRUE)
+
+stock <- stock %>% 
+  mutate(Date = as.Date(Date, format = "%Y-%m-%d")) %>% 
+  mutate_at(vars(Open:Volume), ~as.numeric(.)) %>%
+  filter(Date >= "2019-01-01", Date < "2020-01-01")
+
+head(stock)
+```
+
+
+```{r}
+unique(stock$Index)
+s <- split(stock, stock$Index)
+
+sapply(s, function(x) {colMeans(x["Volume"], na.rm = TRUE)})
+```
+
+
